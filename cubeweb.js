@@ -2,12 +2,16 @@ console.log("Test");
 
 
 
-let newMelody = generate_melody(5);
-console.log(newMelody);
 
-document.getElementById("melody").innerHTML = newMelody;
 
-document.getElementById("harmony").innerHTML = suggest_harmony(newMelody);
+
+function generateNew(){
+    let newMelody = generate_melody(5);
+    console.log(newMelody);
+    
+    document.getElementById("melody").innerHTML = newMelody;
+    document.getElementById("harmony").innerHTML = suggest_harmony(newMelody);
+}
 
 function generate_melody(length){
     let melody = [];
