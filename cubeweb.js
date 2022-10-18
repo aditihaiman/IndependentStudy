@@ -1,13 +1,10 @@
 console.log("Test");
 
 
-
-
-
-
 function generateNew(){
-    let newMelody = generate_melody(5);
-    console.log(newMelody);
+    var x = Number(document.getElementById("length").value);
+    let newMelody = generate_melody(x);
+    console.log(newMelody); 
     
     document.getElementById("melody").innerHTML = newMelody;
     document.getElementById("harmony").innerHTML = suggest_harmony(newMelody);
