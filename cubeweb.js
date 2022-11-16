@@ -29,6 +29,9 @@ function generateNew(){ //onclick of button, generates new melody and several ra
 
 
     document.getElementById("harmony").innerHTML = harmony;
+
+    let weights = calculate_weights();
+    console.log(weights);
 }
 
 
@@ -50,7 +53,7 @@ function generate_melody(n){ //create random melody line of length n
  * Given a melody, returns one possible harmonic progression that would fit with that melody
  * 
  * @param {number} melody The given melody
- * @returns {Array} An array of a possible harmonic progression
+ * @returns {number[]} An array of a possible harmonic progression
  */
 function suggest_harmony(melody){ //suggest harmony given melody
     let harmonies = [[1, 4, 6], [2, 5, 7], [3, 6, 1], [4, 7, 2], [5, 1, 3], [6, 2, 4], [7, 3, 5]];
@@ -79,9 +82,9 @@ Given a melody and corresponding harmony (how to deal with rhythm?? how to reduc
 /**
  * Updates a matrix of weighted probabilities for harmonic transitions given a new harmonic progression
  * 
- * @param {Array} weights A 2d array of numbers representing the current weight
- * @param {*} harmony An array of numbers representing a harmonic progression
- * @returns The 2d array of weights that have been updated
+ * @param {number[][]} weights A 2d array of numbers representing the current weight
+ * @param {number[]} harmony A harmonic progression
+ * @returns {number[][]} The 2d array of weights that have been updated
  */
 function update_weights(weights, harmony){ 
     //traverse melody with associated harmony - compute probability of next harmony given current
@@ -94,8 +97,60 @@ function update_weights(weights, harmony){
     //                 [0, 0, 0, 0, 0, 0, 0]];
 
     for(let i = 0; i < harmony.length-1; i++){
-        weights[i][i+1] += float(harmony[i]) / harmony.length;
+        weights[harmony[i]][harmony[i+1]] += (harmony[i] / harmony.length);
+    }
+}
+
+/**
+ * Calculates weighted probability for each harmonic transition where weights[i][j] is the probability of 
+ * going TO harmony j FROM harmony i.
+ * 
+ * @returns {number[][]} 2d array of weights for harmonic transitions
+ */
+function calculate_weights() {
+    let weights = [
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0]
+    ];
+
+//list of major chord progressions
+//taken from wikipedia: https://en.wikipedia.org/wiki/List_of_chord_progressions
+    let major_progressions = [
+        [1, 5, 6, 4],
+        [1, 6, 4, 5],
+        [2, 5, 1],
+        [6, 2, 5, 1],
+        [1, 5, 4, 4, 1, 5, 1, 5],
+        [1, 4, 2, 5],
+        [1, 5, 6, 3, 4, 1, 4, 5],
+        [1, 4, 1, 5, 1, 4, 1, 5, 1],
+        [1, 6, 2, 5],
+        [5, 4, 1],
+    ];
+
+    for(let harmony of major_progressions) {
+        update_weights(weights, harmony);        
     }
 
+//normalize weights
+    for(let i = 0; i < weights.length; i++){
+        let sum = weights[i].reduce(add, 0);
+        for(let j = 0; j < weights.length; j++){
+            weights[i][j] /= sum;
+        }
+    }
 
+    return weights;
 }
+
+
+function add(accumulator, current){
+    return accumulator + current;
+}
+
+
