@@ -9,6 +9,11 @@ console.log("Test");
 //synth.triggerAttackRelease("C4", "8n");
 
 
+
+/**
+ * On click of button, generates a new melody of a specified length (by text input) and several random harmonies.
+ * Displays the melody and harmonies.
+ */
 function generateNew(){ //onclick of button, generates new melody and several random harmonies
     var x = Number(document.getElementById("length").value);
     let newMelody = generate_melody(x);
@@ -28,11 +33,10 @@ function generateNew(){ //onclick of button, generates new melody and several ra
 
 
 /**
-   * Generates a random melody of a specified length
-   *
-   * @param {number} n The desired length of the melody.
-   * @return {Array} A random melody of length n.
-   */
+ * Generates a random melody of a specified length
+ * @param {number} n Desired length of melody
+ * @returns {Array} A random melody
+ */
 function generate_melody(n){ //create random melody line of length n
     let melody = [];
     for(let i = 0; i < n; i++){
@@ -42,6 +46,12 @@ function generate_melody(n){ //create random melody line of length n
     return melody;
 }
 
+/**
+ * Given a melody, returns one possible harmonic progression that would fit with that melody
+ * 
+ * @param {number} melody The given melody
+ * @returns {Array} An array of a possible harmonic progression
+ */
 function suggest_harmony(melody){ //suggest harmony given melody
     let harmonies = [[1, 4, 6], [2, 5, 7], [3, 6, 1], [4, 7, 2], [5, 1, 3], [6, 2, 4], [7, 3, 5]];
     let suggested = [];
@@ -64,6 +74,15 @@ Given a melody and corresponding harmony (how to deal with rhythm?? how to reduc
 
     **see score-transformer**
 */
+
+
+/**
+ * Updates a matrix of weighted probabilities for harmonic transitions given a new harmonic progression
+ * 
+ * @param {Array} weights A 2d array of numbers representing the current weight
+ * @param {*} harmony An array of numbers representing a harmonic progression
+ * @returns The 2d array of weights that have been updated
+ */
 function update_weights(weights, harmony){ 
     //traverse melody with associated harmony - compute probability of next harmony given current
     // let weights = [[0, 0, 0, 0, 0, 0, 0],
