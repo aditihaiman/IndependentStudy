@@ -9,6 +9,41 @@ console.log("Test");
 //synth.triggerAttackRelease("C4", "8n");
 
 
+//list of major chord progressions
+//taken from wikipedia: https://en.wikipedia.org/wiki/List_of_chord_progressions
+let major_progressions = [
+    [1, 5, 6, 4],
+    [1, 6, 4, 5],
+    [2, 5, 1],
+    [6, 2, 5, 1],
+    [1, 5, 4, 4, 1, 5, 1, 5],
+    [1, 4, 2, 5],
+    [1, 5, 6, 3, 4, 1, 4, 5],
+    [1, 4, 1, 5, 1, 4, 1, 5, 1],
+    [1, 6, 2, 5],
+    [5, 4, 1],
+];
+
+let major_circle_progressions = [
+    [1, 3, 6, 2, 5, 1],
+    [1, 3, 6, 2, 7, 1],
+    [1, 3, 6, 4, 5, 1],
+    [1, 3, 6, 4, 7, 1],
+    [1, 6, 2, 5, 1],
+    [1, 6, 2, 7, 1],
+    [1, 6, 4, 5, 1],
+    [1, 6, 4, 7, 1],
+    [1, 2, 5, 1],
+    [1, 2, 7, 1],
+    [1, 4, 5, 1],
+    [1, 4, 7, 1],
+    [1, 5, 1],
+    [1, 7, 1],
+
+];
+
+
+
 
 /**
  * On click of button, generates a new melody of a specified length (by text input) and several random harmonies.
@@ -23,14 +58,15 @@ function generateNew(){ //onclick of button, generates new melody and several ra
     
     let harmony = "";
     
+    let weights = calculate_weights();
     for(let i = 0; i < 5; i++){
-        harmony += suggest_harmony(newMelody).toString() + "<BR/>";
+        harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
     }
 
 
     document.getElementById("harmony").innerHTML = harmony;
 
-    let weights = calculate_weights();
+    
     console.log(weights);
 }
 
@@ -50,21 +86,35 @@ function generate_melody(n){ //create random melody line of length n
 }
 
 /**
- * Given a melody, returns one possible harmonic progression that would fit with that melody
+ * Given a melody, returns one possible random harmonic progression that would fit with that melody
  * 
  * @param {number} melody The given melody
  * @returns {number[]} An array of a possible harmonic progression
  */
-function suggest_harmony(melody){ //suggest harmony given melody
+function suggest_random_harmony(melody){ //suggest harmony given melody
     let harmonies = [[1, 4, 6], [2, 5, 7], [3, 6, 1], [4, 7, 2], [5, 1, 3], [6, 2, 4], [7, 3, 5]];
     let suggested = [];
     for(let note of melody){
         let idx = Math.floor(Math.random()*3);
-//        console.log(idx, note, harmonies[note]);
         suggested.push(harmonies[note-1][idx]);
     }
     return suggested;
     
+}
+
+/**
+ * Given a melody, suggest a harmony based on weighted probabilities
+ * 
+ * @param {number[]} melody Array of notes
+ * @param {number[][]} weights Weighted probabilities
+ * @returns {number[]} harmonic progression
+ */
+function suggest_harmony(melody, weights){
+    let suggested = [];
+    for(let note of melody){
+        suggested.push(weights[note-1].indexOf(Math.max.apply(Math, weights[note-1]))+1);
+    }
+    return suggested;
 }
 
 
@@ -97,7 +147,7 @@ function update_weights(weights, harmony){
     //                 [0, 0, 0, 0, 0, 0, 0]];
 
     for(let i = 0; i < harmony.length-1; i++){
-        weights[harmony[i]][harmony[i+1]] += (harmony[i] / harmony.length);
+        weights[harmony[i]-1][harmony[i+1]-1] += (1 / harmony.length);
     }
 }
 
@@ -118,22 +168,7 @@ function calculate_weights() {
         [0, 0, 0, 0, 0, 0, 0]
     ];
 
-//list of major chord progressions
-//taken from wikipedia: https://en.wikipedia.org/wiki/List_of_chord_progressions
-    let major_progressions = [
-        [1, 5, 6, 4],
-        [1, 6, 4, 5],
-        [2, 5, 1],
-        [6, 2, 5, 1],
-        [1, 5, 4, 4, 1, 5, 1, 5],
-        [1, 4, 2, 5],
-        [1, 5, 6, 3, 4, 1, 4, 5],
-        [1, 4, 1, 5, 1, 4, 1, 5, 1],
-        [1, 6, 2, 5],
-        [5, 4, 1],
-    ];
-
-    for(let harmony of major_progressions) {
+    for(let harmony of major_circle_progressions) {
         update_weights(weights, harmony);        
     }
 
