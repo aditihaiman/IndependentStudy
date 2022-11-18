@@ -38,8 +38,34 @@ let major_circle_progressions = [
     [1, 4, 5, 1],
     [1, 4, 7, 1],
     [1, 5, 1],
-    [1, 7, 1],
+    [1, 7, 1]
+];
 
+let major = [
+    [1, 5, 6, 4],
+    [1, 6, 4, 5],
+    [2, 5, 1],
+    [6, 2, 5, 1],
+    [1, 5, 4, 4, 1, 5, 1, 5],
+    [1, 4, 2, 5],
+    [1, 5, 6, 3, 4, 1, 4, 5],
+    [1, 4, 1, 5, 1, 4, 1, 5, 1],
+    [1, 6, 2, 5],
+    [5, 4, 1],
+    [1, 3, 6, 2, 5, 1],
+    [1, 3, 6, 2, 7, 1],
+    [1, 3, 6, 4, 5, 1],
+    [1, 3, 6, 4, 7, 1],
+    [1, 6, 2, 5, 1],
+    [1, 6, 2, 7, 1],
+    [1, 6, 4, 5, 1],
+    [1, 6, 4, 7, 1],
+    [1, 2, 5, 1],
+    [1, 2, 7, 1],
+    [1, 4, 5, 1],
+    [1, 4, 7, 1],
+    [1, 5, 1],
+    [1, 7, 1]
 ];
 
 
@@ -59,7 +85,7 @@ function generateNew(){ //onclick of button, generates new melody and several ra
     let harmony = "";
     
     let weights = calculate_weights();
-    for(let i = 0; i < 5; i++){
+    for(let i = 0; i < 1; i++){
         harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
     }
 
@@ -110,11 +136,29 @@ function suggest_random_harmony(melody){ //suggest harmony given melody
  * @returns {number[]} harmonic progression
  */
 function suggest_harmony(melody, weights){
-    let suggested = [];
-    for(let note of melody){
-        suggested.push(weights[note-1].indexOf(Math.max.apply(Math, weights[note-1]))+1);
+    let suggested = [melody[0]]; //start on same harmony as starting note ***CHANGE LATER****
+    let sIdx = 0;
+    console.log(weights);
+    for(let i = 1; i < melody.length; i++){
+        let note = melody[i]-1;
+        // suggested.push(weights[note-1].indexOf(Math.max.apply(Math, weights[note-1]))+1);
+
+        let prev = suggested[sIdx]-1; // previous harmony
+        
+        //get max probability of the three possible harmonies the next note belongs to
+        //console.log("weights: " + weights[prev][(note) - 1], weights[prev][(note + 3) % 7 - 1], weights[prev][(note + 5) % 7 - 1]);
+        let max = Math.max(weights[prev][note], weights[prev][(note + 3) % 7], weights[prev][(note + 5) % 7]);
+        
+        let next = weights[prev].indexOf(max)+1
+        console.log("prev: " + prev + "   next: " + next + "   max: " + max);
+        
+        suggested.push(next);
+        console.log("suggested: " + suggested);
+        sIdx++;
+
     }
     return suggested;
+    
 }
 
 
@@ -168,7 +212,7 @@ function calculate_weights() {
         [0, 0, 0, 0, 0, 0, 0]
     ];
 
-    for(let harmony of major_circle_progressions) {
+    for(let harmony of major) {
         update_weights(weights, harmony);        
     }
 
