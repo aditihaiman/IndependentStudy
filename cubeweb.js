@@ -68,7 +68,26 @@ let major = [
     [1, 7, 1]
 ];
 
+function generateFromRandom(){
+    var x = Number(document.getElementById("length").value);
 
+    let newMelody = generate_melody(x);
+
+    document.getElementById("printmelody").innerHTML = newMelody;
+
+    let harmony = "";
+    
+    let weights = calculate_weights();
+    for(let i = 0; i < 1; i++){
+        harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
+    }
+
+
+    document.getElementById("harmony").innerHTML = harmony;
+
+    
+    console.log(weights);
+}
 
 
 /**
@@ -76,17 +95,19 @@ let major = [
  * Displays the melody and harmonies.
  */
 function generateNew(){ //onclick of button, generates new melody and several random harmonies
-    var x = Number(document.getElementById("length").value);
-    let newMelody = generate_melody(x);
-    console.log(newMelody);
+    let user_melody = document.getElementById("melody").value;
     
-    document.getElementById("melody").innerHTML = newMelody;
+    user_melody = user_melody.split(", ");
+    for(let i = 0; i<user_melody.length; i++) user_melody[i] = Number(user_melody[i]);
+    console.log(user_melody);
+
+    document.getElementById("printmelody").innerHTML = user_melody;
     
     let harmony = "";
     
     let weights = calculate_weights();
     for(let i = 0; i < 1; i++){
-        harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
+        harmony += suggest_harmony(user_melody, weights).toString() + "<BR/>";
     }
 
 
@@ -181,15 +202,6 @@ Given a melody and corresponding harmony (how to deal with rhythm?? how to reduc
  * @returns {number[][]} The 2d array of weights that have been updated
  */
 function update_weights(weights, harmony){ 
-    //traverse melody with associated harmony - compute probability of next harmony given current
-    // let weights = [[0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0],
-    //                 [0, 0, 0, 0, 0, 0, 0]];
-
     for(let i = 0; i < harmony.length-1; i++){
         weights[harmony[i]-1][harmony[i+1]-1] += (1 / harmony.length);
     }
@@ -211,9 +223,8 @@ function calculate_weights() {
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0]
     ];
-
-    for(let harmony of major) {
-        update_weights(weights, harmony);        
+    for(let progression of major_circle_progressions) {
+        update_weights(weights, progression);        
     }
 
 //normalize weights
