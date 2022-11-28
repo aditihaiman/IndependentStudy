@@ -1,7 +1,5 @@
 //import * as Tone from 'tone'
 
-console.log("Test");
-
 //create a synth and connect it to the main output (your speakers)
 //const synth = new Tone.Synth().toDestination();
 
@@ -86,7 +84,7 @@ function generateFromRandom(){
     document.getElementById("harmony").innerHTML = harmony;
 
     
-    console.log(weights);
+    // console.log(weights);
 }
 
 
@@ -110,11 +108,9 @@ function generateNew(){ //onclick of button, generates new melody and several ra
         harmony += suggest_harmony(user_melody, weights).toString() + "<BR/>";
     }
 
-
     document.getElementById("harmony").innerHTML = harmony;
 
-    
-    console.log(weights);
+    // console.log(weights);
 }
 
 
