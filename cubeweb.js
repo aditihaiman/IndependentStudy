@@ -9,6 +9,44 @@
 
 //list of major chord progressions
 //taken from wikipedia: https://en.wikipedia.org/wiki/List_of_chord_progressions
+let melody_from_data = [];
+
+if (!!window.EventSource) {
+    var source = new EventSource('/events');
+  
+    source.addEventListener('open', function(e) {
+      console.log("Events Connected");
+    }, false);
+  
+    source.addEventListener('error', function(e) {
+      if (e.target.readyState != EventSource.OPEN) {
+        console.log("Events Disconnected");
+      }
+    }, false);
+  
+    source.addEventListener('message', function(e) {
+      console.log("message", e.data);
+    }, false);
+  
+    source.addEventListener('acc_data', function(e) {
+      console.log("acc_data", e.data);
+      melody_from_data.push(Number(e.data));
+
+    }, false);
+  }
+
+
+
+let weights_1 = [
+    [0.086, 0.072, 0.072, 0.177, 0.21, 0.11, 0.07],
+    [0.17, 0.018, 0.11, 0.14, 0.29, 0.11, 0.007],
+    [0.08, 0.15, 0.006, 0.286, 0.11, 0.21, 0.024],
+    [0.286, 0.056, 0.084, 0.047, 0.259, 0.073, 0.003],
+    [0.351, 0.041, 0.034, 0.167, 0.019, 0.16, 0.002],
+    [0.114, 0.052, 0.062, 0.26, 0.265, 0.016, 0.032],
+    [0.3, 0.05, 0.13, 0.07, 0.16, 0.29]
+]
+
 let major_progressions = [
     [1, 5, 6, 4],
     [1, 6, 4, 5],
@@ -36,7 +74,8 @@ let major_circle_progressions = [
     [1, 4, 5, 1],
     [1, 4, 7, 1],
     [1, 5, 1],
-    [1, 7, 1]
+    [1, 7, 1],
+    [7, 3]
 ];
 
 let major = [
@@ -63,10 +102,82 @@ let major = [
     [1, 4, 5, 1],
     [1, 4, 7, 1],
     [1, 5, 1],
-    [1, 7, 1]
+    [1, 7, 1],
+    [7, 3]
 ];
 
+let minor_circle_progressions = [
+    [1, 7, 3, 6, 2, 5, 1],
+    [1, 7, 3, 6, 4, 5, 1],
+    [1, 7, 3, 6, 2, 7, 1],
+    [1, 7, 3, 6, 4, 7, 1],
+    [1, 3, 6, 2, 5, 1],
+    [1, 3, 6, 2, 7, 1],
+    [1, 3, 6, 4, 5, 1],
+    [1, 3, 6, 4, 7, 1],
+    
+]
+
+let pop_progressions = [
+    [1, 5, 6, 4, 1],
+    [1, 6, 4, 5, 1],
+    [6, 4, 1, 5, 6],
+    [1, 4, 5, 1],
+    [1, 5, 6, 1],
+    [2, 5, 1, 2],
+    [1, 4, 6, 5, 1],
+]
+
+let game_progressions = [
+    [2, 5, 1, 2],
+    [4, 3, 2, 1, 4],
+    [1, 6, 7, 1],
+    [1, 6, 2, 5, 1, 6, 2, 2, 1],
+    [1, 5, 6, 5, 1],
+    [1, 3, 6, 2, 5, 1],
+    [1, 4, 6, 7, 1, 4, 1, 4, 1],
+    [4, 5, 1, 6, 4],
+    [1, 6, 7, 5],
+    [1, 3, 1],
+    
+]
+
+function generateFromData(){
+    let prog = document.getElementById("progression").value;
+    console.log(prog);
+    let progression;
+
+    if (prog=="classic") progression = major_circle_progressions;
+    if (prog=="pop") progression = pop_progressions;
+    if (prog=="game") progression = game_progressions;
+
+    let newMelody = melody_from_data;
+    document.getElementById("printmelody").innerHTML = newMelody;
+
+    let harmony = "";
+    
+    let weights = calculate_weights(progression);
+    // let weights = weights_1;
+    for(let i = 0; i < 1; i++){
+        harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
+    }
+
+
+    document.getElementById("harmony").innerHTML = harmony;
+
+
+}
+
 function generateFromRandom(){
+    let prog = document.getElementById("progression").value;
+    console.log(prog);
+    let progression;
+
+    if (prog=="classic") progression = major_circle_progressions;
+    if (prog=="pop") progression = pop_progressions;
+    if (prog=="game") progression = game_progressions;
+
+    
     var x = Number(document.getElementById("length").value);
 
     let newMelody = generate_melody(x);
@@ -75,7 +186,8 @@ function generateFromRandom(){
 
     let harmony = "";
     
-    let weights = calculate_weights();
+    let weights = calculate_weights(progression);
+    // let weights = weights_1;
     for(let i = 0; i < 1; i++){
         harmony += suggest_harmony(newMelody, weights).toString() + "<BR/>";
     }
@@ -93,6 +205,15 @@ function generateFromRandom(){
  * Displays the melody and harmonies.
  */
 function generateNew(){ //onclick of button, generates new melody and several random harmonies
+    let prog = document.getElementById("progression").value;
+    console.log(prog);
+    let progression;
+
+    if (prog=="classic") progression = major_circle_progressions;
+    if (prog=="pop") progression = pop_progressions;
+    if (prog=="game") progression = game_progressions;
+
+    
     let user_melody = document.getElementById("melody").value;
     
     user_melody = user_melody.split(", ");
@@ -103,7 +224,8 @@ function generateNew(){ //onclick of button, generates new melody and several ra
     
     let harmony = "";
     
-    let weights = calculate_weights();
+    let weights = calculate_weights(progression);
+    // let weights = weights_1;
     for(let i = 0; i < 1; i++){
         harmony += suggest_harmony(user_melody, weights).toString() + "<BR/>";
     }
@@ -209,7 +331,7 @@ function update_weights(weights, harmony){
  * 
  * @returns {number[][]} 2d array of weights for harmonic transitions
  */
-function calculate_weights() {
+function calculate_weights(progression) {
     let weights = [
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
@@ -219,8 +341,8 @@ function calculate_weights() {
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0]
     ];
-    for(let progression of major_circle_progressions) {
-        update_weights(weights, progression);        
+    for(let prog of progression) {
+        update_weights(weights, prog);        
     }
 
 //normalize weights
@@ -238,5 +360,7 @@ function calculate_weights() {
 function add(accumulator, current){
     return accumulator + current;
 }
+
+
 
 
