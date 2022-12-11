@@ -204,7 +204,7 @@ function generateFromRandom(){
  * On click of button, generates a new melody of a specified length (by text input) and several random harmonies.
  * Displays the melody and harmonies.
  */
-function generateNew(){ //onclick of button, generates new melody and several random harmonies
+function generateNew(){ 
     let prog = document.getElementById("progression").value;
     console.log(prog);
     let progression;
@@ -225,14 +225,11 @@ function generateNew(){ //onclick of button, generates new melody and several ra
     let harmony = "";
     
     let weights = calculate_weights(progression);
-    // let weights = weights_1;
     for(let i = 0; i < 1; i++){
         harmony += suggest_harmony(user_melody, weights).toString() + "<BR/>";
     }
 
     document.getElementById("harmony").innerHTML = harmony;
-
-    // console.log(weights);
 }
 
 
@@ -245,7 +242,6 @@ function generate_melody(n){ //create random melody line of length n
     let melody = [];
     for(let i = 0; i < n; i++){
         melody.push(Math.floor(Math.random() * 7)+1);
-//        console.log(melody);
     }
     return melody;
 }
@@ -256,7 +252,7 @@ function generate_melody(n){ //create random melody line of length n
  * @param {number} melody The given melody
  * @returns {number[]} An array of a possible harmonic progression
  */
-function suggest_random_harmony(melody){ //suggest harmony given melody
+function suggest_random_harmony(melody){ 
     let harmonies = [[1, 4, 6], [2, 5, 7], [3, 6, 1], [4, 7, 2], [5, 1, 3], [6, 2, 4], [7, 3, 5]];
     let suggested = [];
     for(let note of melody){
@@ -275,17 +271,15 @@ function suggest_random_harmony(melody){ //suggest harmony given melody
  * @returns {number[]} harmonic progression
  */
 function suggest_harmony(melody, weights){
-    let suggested = [melody[0]]; //start on same harmony as starting note ***CHANGE LATER****
+    let suggested = [melody[0]]; 
     let sIdx = 0;
     console.log(weights);
     for(let i = 1; i < melody.length; i++){
         let note = melody[i]-1;
-        // suggested.push(weights[note-1].indexOf(Math.max.apply(Math, weights[note-1]))+1);
 
         let prev = suggested[sIdx]-1; // previous harmony
         
         //get max probability of the three possible harmonies the next note belongs to
-        //console.log("weights: " + weights[prev][(note) - 1], weights[prev][(note + 3) % 7 - 1], weights[prev][(note + 5) % 7 - 1]);
         let max = Math.max(weights[prev][note], weights[prev][(note + 3) % 7], weights[prev][(note + 5) % 7]);
         
         let next = weights[prev].indexOf(max)+1
@@ -299,17 +293,6 @@ function suggest_harmony(melody, weights){
     return suggested;
     
 }
-
-
-/*
-Given a melody and corresponding harmony (how to deal with rhythm?? how to reduce
-    a piece to just basic melody andh harmony??), produce weighted probabilities
-    for each corresponding harmony and note of melody.
-
-    SEE AI NOTES
-
-    **see score-transformer**
-*/
 
 
 /**
